@@ -1,0 +1,117 @@
+[
+    {
+        "status": 400,
+        "code": "ERR_BAD_REQUEST",
+        "description": "The request could not be understood by the server due to malformed syntax."
+    },
+    {
+        "status": 401,
+        "code": "ERR_UNAUTHORIZED",
+        "description": "The request requires user authentication."
+    },
+    {
+        "status": 402,
+        "code": "ERR_PAYMENT_REQUIRED",
+        "description": "The request cannot be processed without a valid payment."
+    },
+    {
+        "status": 403,
+        "code": "ERR_FORBIDDEN",
+        "description": "The request was forbidden."
+    },
+    {
+        "status": 404,
+        "code": "ERR_NOT_FOUND",
+        "description": "The requested resource could not be found."
+    },
+    {
+        "status": 405,
+        "code": "ERR_METHOD_NOT_ALLOWED",
+        "description": "The request method is known by the server but has been disabled and cannot be used."
+    },
+    {
+        "status": 409,
+        "code": "ERR_CONFLICT",
+        "description": "The request could not be processed because of a conflict in the request."
+    },
+    {
+        "status": 411,
+        "code": "ERR_LENGTH_REQUIRED",
+        "description": "The server refuses to accept the request without a defined Content-Length."
+    },
+    {
+        "status": 412,
+        "code": "ERR_PRECONDITION_FAILED",
+        "description": "The server does not meet one of the preconditions that the requester put on the request."
+    },
+    {
+        "status": 413,
+        "code": "ERR_PAYLOAD_TOO_LARGE",
+        "description": "The server is refusing to process a request because the request payload is larger than the server is willing or able to process."
+    },
+    {
+        "status": 415,
+        "code": "ERR_UNSUPPORTED_MEDIA_TYPE",
+        "description": "The server is refusing to service the request because the entity of the request is in a format not supported by the requested resource for the requested method."
+    },
+    {
+        "status": 429,
+        "code": "ERR_TOO_MANY_REQUESTS",
+        "description": "The server is refusing to process the request because the user has sent too many requests in a given amount of time."
+    },
+    {
+        "status": 500,
+        "code": "ERR_INTERNAL_SERVER_ERROR",
+        "description": "The server encountered something unexpected that didn't allow it to complete the request."
+    },
+    {
+        "status": 501,
+        "code": "ERR_NOT_IMPLEMENTED",
+        "description": "The server does not support the functionality required to fulfill the request."
+    },
+    {
+        "status": 502,
+        "code": "ERR_BAD_GATEWAY",
+        "description": "The server received an invalid response from an upstream server, or the request could not be processed due to a bad gateway."
+    },
+    {
+        "status": 503,
+        "code": "ERR_SERVICE_UNAVAILABLE",
+        "description": "The server is currently unable to handle the request due to a temporary overloading or maintenance of the server."
+    },
+    {
+        "status": 504,
+        "code": "ERR_GATEWAY_TIMEOUT",
+        "description": "The server did not receive a timely response from an upstream server."
+    },
+    {
+        "status": 1001,
+        "code": "ERR_ADMIN_ONLY",
+        "description": "Only platform administrators can perform this action.",
+        "customStatus": true
+    },
+    {
+        "status": 1002,
+        "code": "ERR_INACCESSIBLE",
+        "description": "The requested resource is available on the platform but inaccessible without manual request through email with reference.",
+        "customStatus": true
+    },
+    {
+        "status": 1003,
+        "code": "ERR_COPYRIGHTED",
+        "description": "The requested resource has been removed from the platform due to copyright takedown request.",
+        "customStatus": true
+    },
+    {
+        "status": 1004,
+        "code": "ERR_BANNED",
+        "description": "The requested resource has been banned from the platform.",
+        "customStatus": true
+    },
+    {
+        "status": 1005,
+        "code": "ERR_USER_EXISTS",
+        "description": "The user already exists.",
+        "customStatus": true
+    }
+]
