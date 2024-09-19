@@ -113,5 +113,11 @@
         "code": "ERR_USER_EXISTS",
         "description": "The user already exists.",
         "customStatus": true
+    },
+    {
+        "status": 1006,
+        "code": "ERR_NO_DESTINATION",
+        "description": "Request body must have either a chatId or a reciepent property.",
+        "customStatus": true
     }
 ]

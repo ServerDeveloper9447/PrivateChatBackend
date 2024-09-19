@@ -9,9 +9,18 @@
     "email": {id:"validated_verified_email",verified:Boolean},
     "about": "max_120_char_string",
     "public_key": String,
-    "chatIds": String[],
+    "chatIds": ObjectId[],
     "createdAt": Date,
     "banned": Boolean
+}
+```
+## User Summary Schema
+```json
+{
+    "_id": ObjectId,
+    "username": String,
+    "avatar"?: String,
+    "public_key": String
 }
 ```
 ## Messages Schema
@@ -20,18 +29,20 @@
     "_id": ObjectId,
     "content": String,
     "createdAt": String,
+    "createdBy": ObjectId,
     "edited": Boolean,
-    "chatId": String
+    "read": Boolean,
+    "chatId": ObjectId
 }
 ```
 ## Chats Schema
 ```json
 {
     "_id": ObjectId,
-    "name": String,
     "createdAt": String,
-    "createdBy": String,
-    "messageIds": String[],
+    "createdBy": ObjectId,
+    "messageIds": ObjectId[],
     "avatar": "base64string",
-    "memberIds": String[]
+    "memberIds": ObjectId[] | ObjectId,
+    "direct": Boolean
 }

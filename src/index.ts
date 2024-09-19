@@ -1,17 +1,18 @@
 import { config } from "dotenv";
 config()
+import http from 'http'
 import express from 'express'
 import { Request, Response } from "express";
 import {MongoClient, ObjectId, ServerApiVersion} from 'mongodb'
-import * as errors from './errors.json'
+import * as errors from './assets/errors.json'
 import crypto from 'crypto'
-const client = new MongoClient(process.env.MONGO_URI!,{serverApi:{strict:true,deprecationErrors:true,version:ServerApiVersion.v1}})
+export const client = new MongoClient(process.env.MONGO_URI!,{serverApi:{strict:true,deprecationErrors:true,version:ServerApiVersion.v1}})
 export const db = client.db('Primary')
 export const makeError = (status:number,res:Res) => {
+    const data = errors.find(err => err.status === status)!
+    res.status(data.customStatus == true ? 400 : data.status).send(data)
     return function(error?:any) {
         console.trace(error)
-        const data = errors.find(err => err.status === status)!
-        res.status(data.customStatus == true ? 200 : data.status).send(data)
     }
 }
 import users from './user'
@@ -20,6 +21,7 @@ import { z } from "zod";
 import { userValidate } from "./validations";
 
 const app = express()
+export const server = http.createServer(app)
 
 export type User = {
     "_id": ObjectId,
@@ -31,7 +33,7 @@ export type User = {
     },
     "about"?: String,
     "public_key": String,
-    "chatIds": String[] | [],
+    "chatIds": ObjectId[] | [],
     "createdAt": Date,
     "banned"?: Boolean
 }
@@ -39,7 +41,7 @@ export type User = {
 declare global {
     namespace Express {
         interface Request {
-            user: User | null
+            user: User & {}
         }
     }
 }
@@ -67,6 +69,10 @@ const userRegisterSchema = z.object({
     username: z.string(),
     password: z.string().min(8,"Password must be 8 characters long."),
     email: z.string().email()
+})
+const userLoginSchema = z.object({
+    identifier: z.string().or(z.string().email()),
+    password: z.string().min(8,"Password must be 8 characters long.")
 })
 
 app.post('/register',(req:Request,res:Res) => {
@@ -106,6 +112,25 @@ app.post('/register',(req:Request,res:Res) => {
     }
 })
 
+app.post('/login',(req:Request,res:Res) => {
+    try {
+        const {identifier,password} = userLoginSchema.parse(req.body)
+        db.collection('Users').findOne({$or:[{username:identifier},{email:identifier}]})
+        .then(user => {
+            if(!user) return makeError(401,res)()
+            crypto.pbkdf2(password, user.pass_salt, 310000, 32, 'sha256', (err, hash) => {
+                if(err) return makeError(500,res)(err);
+                if(hash.toString('hex') !== user.password) return makeError(401,res)()
+                const at = crypto.randomBytes(32).toString('hex')
+                const rt = crypto.randomBytes(32).toString('hex')
+                db.collection('Users').updateOne({_id:user._id},{$set:{access_token:at,refresh_token:rt}})
+                .then(() => res.send({status:200,access_token:at,refresh_token:rt}))
+                .catch(makeError(500,res))
+            })
+        })
+    } catch(err) {makeError(400,res)}
+})
+
 app.post('/refresh_tokens',async (req:Request,res:Res) => {
     try {
         const {refresh_token:ref} = req.body
@@ -126,4 +151,4 @@ app.post('/refresh_tokens',async (req:Request,res:Res) => {
 app.use('/users',userValidate,users)
 app.use('/chats',userValidate,chats)
 
-app.listen(process.env.PORT || 3000, () => console.log("Backend Online"))
+server.listen(process.env.PORT || 3000, () => console.log("Backend Online"))
