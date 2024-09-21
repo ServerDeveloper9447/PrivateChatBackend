@@ -27,24 +27,26 @@ Content-Type: application/json
 
 ### Search user
 GET http://localhost:3000/users/search?username=demouser1
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImRlbW91c2VyMSIsIl9pZCI6IjY2ZWVhMzQ5NzdkMTZiODE1ZDdjMzE1MCIsImlhdCI6MTcyNjkxNTQwMSwiZXhwIjoxNzI5NTA3NDAxfQ.V2KAHVjj8k-h3dK6ErQR0aNFxiLduHau4-LFXWeO-Ak
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImRlbW91c2VyMSIsIl9pZCI6IjY2ZWVhMzQ5NzdkMTZiODE1ZDdjMzE1MCIsImlhdCI6MTcyNjkyOTQ3MywiZXhwIjoxNzI5NTIxNDczfQ.32bOwCnigtcKQkWfNDkXU2w1U0cZKUByfy222mLj1N4
 
 ### Get User Chats
 GET http://localhost:3000/users/chats
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImRlbW91c2VyMSIsIl9pZCI6IjY2ZWVhMzQ5NzdkMTZiODE1ZDdjMzE1MCIsImlhdCI6MTcyNjkxNTQwMSwiZXhwIjoxNzI5NTA3NDAxfQ.V2KAHVjj8k-h3dK6ErQR0aNFxiLduHau4-LFXWeO-Ak
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImRlbW91c2VyMSIsIl9pZCI6IjY2ZWVhMzQ5NzdkMTZiODE1ZDdjMzE1MCIsImlhdCI6MTcyNjkzMTc4MCwiZXhwIjoxNzI5NTIzNzgwfQ.s9rGPlYZilZr5_4gKapJFCu40_qSjGYjUtGj7ZlFbtQ
+
+
 
 ### Get chat
 GET http://localhost:3000/chats/66ee92d72e977b1167c075c7
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImRlbW91c2VyMSIsIl9pZCI6IjY2ZWRhMmEwNzk3Mzk0YWNjZTY4MDhhYyIsImlhdCI6MTcyNjkxMTQxNCwiZXhwIjoxNzI5NTAzNDE0fQ.OQ4aOTHpfaMYsidglXmQLl3lSP5smCZe7biNsQmIkQc
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImRlbW91c2VyMSIsIl9pZCI6IjY2ZWVhMzQ5NzdkMTZiODE1ZDdjMzE1MCIsImlhdCI6MTcyNjkyOTU4OCwiZXhwIjoxNzI5NTIxNTg4fQ.EZLNnnP1ehkuhBoHBoDbjOumGmFEHVlaabbZ-MsLVvk
 
 ### Send Message
-POST http://localhost:3000/chats/66ee92d72e977b1167c075c7/messages
+POST http://localhost:3000/chats/66eea34977d16b815d7c3150/messages
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImRlbW91c2VyMSIsIl9pZCI6IjY2ZWRhMmEwNzk3Mzk0YWNjZTY4MDhhYyIsImlhdCI6MTcyNjkxMTQxNCwiZXhwIjoxNzI5NTAzNDE0fQ.OQ4aOTHpfaMYsidglXmQLl3lSP5smCZe7biNsQmIkQc
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImRlbW91c2VyMSIsIl9pZCI6IjY2ZWVhMzQ5NzdkMTZiODE1ZDdjMzE1MCIsImlhdCI6MTcyNjkzMTc4MCwiZXhwIjoxNzI5NTIzNzgwfQ.s9rGPlYZilZr5_4gKapJFCu40_qSjGYjUtGj7ZlFbtQ
 
 {
     "content": "SGVsbG8gZ3V5cw==",
     "createdAt": "2024-09-21T09:29:35.267Z",
-    "createdBy": "66eda2a0797394acce6808ac",
-    "chatId": "66ee92d72e977b1167c075c7"
+    "createdBy": "66eea34977d16b815d7c3150",
+    "chatId": "66eea34977d16b815d7c3150"
 }

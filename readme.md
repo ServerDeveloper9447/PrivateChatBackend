@@ -31,7 +31,7 @@
     "createdAt": String,
     "createdBy": ObjectId,
     "edited": Boolean,
-    "read": Boolean,
+    "readBy": ObjectId[],
     "chatId": ObjectId
 }
 ```

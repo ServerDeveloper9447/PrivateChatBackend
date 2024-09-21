@@ -125,5 +125,17 @@
         "code": "ERR_TOKEN_MISMATCH",
         "description": "The token provided is valid. However, it is revoked and cannot be used to authenticate.",
         "customStatus": true
+    },
+    {
+        "status": 1008,
+        "code": "ERR_CHAT_DIRECT",
+        "description": "Direct chats must be created by sending a message to an user.",
+        "customStatus": true
+    },
+    {
+        "status": 1009,
+        "code": "ERR_VALUE_DUPLICATE",
+        "description": "Request body includes one or more duplicate values.",
+        "customStatus": true
     }
 ]

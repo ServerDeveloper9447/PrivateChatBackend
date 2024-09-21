@@ -14,7 +14,7 @@ router.get('/',(req:express.Request,res:Res) => {
 router.get('/search',async (req:express.Request,res:Res) => {
     if(!req.query.username) return makeError(400,res);
     try {
-        const user = await users.findOne({username:req.query.username},{projection:{username:1,avatar:1,about:1,createdAt:1,banned:1}})
+        const user = await users.findOne({username:req.query.username},{projection:{username:1,avatar:1,about:1,createdAt:1,banned:1,public_key:1}})
         if(!user) return makeError(404,res);
         return res.send({status:1,user})
     } catch(err) {makeError(500,res)(err)}

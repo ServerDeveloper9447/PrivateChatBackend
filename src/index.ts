@@ -7,8 +7,11 @@ import {MongoClient, ObjectId, ServerApiVersion} from 'mongodb'
 import errors from './assets/errors.json'
 import crypto from 'crypto'
 import jwt from "jsonwebtoken";
+import { z } from "zod";
 export const client = new MongoClient(process.env.MONGO_URI!,{serverApi:{strict:true,deprecationErrors:true,version:ServerApiVersion.v1}})
 export const db = client.db('Primary')
+const app = express()
+export const server = http.createServer(app)
 export const makeError = (status:number,res:Res) => {
     const data = errors.find(err => err.status === status)!
     res.status(data.customStatus == true ? 400 : data.status).send(data)
@@ -16,28 +19,10 @@ export const makeError = (status:number,res:Res) => {
         console.trace(error)
     }
 }
+import { userSchema, userValidate } from "./validations";
+export type User = z.infer<typeof userSchema>;
 import users from './user'
 import chats from './chat'
-import { z } from "zod";
-import { userValidate } from "./validations";
-
-const app = express()
-export const server = http.createServer(app)
-export type User = {
-    "_id": ObjectId,
-    "username": String,
-    "avatar"?: String,
-    "email": {
-        id: String,
-        verified?: Boolean
-    },
-    "about"?: String,
-    "public_key": String
-    "chatIds": ObjectId[] | [],
-    "createdAt": Date,
-    "banned"?: Boolean
-}
-
 declare global {
     namespace Express {
         interface Request {
