@@ -39,10 +39,11 @@
 ```json
 {
     "_id": ObjectId,
+    "name": String | undefined, // undefined if it's a direct message
     "createdAt": String,
     "createdBy": ObjectId,
-    "messageIds": ObjectId[],
+    "messageIds": ObjectId[] | [],
     "avatar": "base64string",
-    "memberIds": ObjectId[] | ObjectId,
+    "memberIds": ObjectId[],
     "direct": Boolean
 }

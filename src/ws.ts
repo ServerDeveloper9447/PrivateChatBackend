@@ -1,22 +1,26 @@
 // WARNING: THIS IS JUST SAMPLE CODE. IT ISN'T EVEN MODIFIED LIKE THE OTHER FILES.
 
 import { Server, WebSocket } from 'ws'
-import { server } from '.'
+import { server, User } from '.'
 
-const wss = new Server({server})
+export const wss = new Server({server})
 
-interface Connection extends WebSocket {
-    isAlive: Boolean
+interface Connection {
+    isAlive: Boolean,
+    user:User,
+    ws: WebSocket
 }
 
-wss.on('connection',function(ws: Connection) {
-    ws.isAlive = true
+export const connections: Connection[] = []
+
+wss.on('connection',function(ws: WebSocket) {
     ws.on('error',console.error)
-    ws.on('pong',function() {ws.isAlive = true})
+    ws.on('pong',function() {
+        connections.find(x => x.ws === ws)!.isAlive = true
+    })
     ws.on('message',(raw) => {
         try {
             const data = JSON.parse(raw.toString())
-            
         } catch(err) {
             console.trace(err)
             ws.send(JSON.stringify({status:400}))
@@ -25,11 +29,11 @@ wss.on('connection',function(ws: Connection) {
 })
 
 const interval = setInterval(function() {
-    wss.clients.forEach(function (ws:WebSocket) {
-        const cn = ws as Connection
-        if(cn.isAlive === false) return cn.terminate();
-        cn.isAlive = false
-        ws.ping()
+    wss.clients.forEach(function (ws) {
+        const cn = connections.find(x => x.ws === ws as WebSocket)!
+        if(cn.isAlive === false) return cn.ws.terminate();
+        cn.isAlive = false;
+        ws.ping();
     })
 },30000)
 

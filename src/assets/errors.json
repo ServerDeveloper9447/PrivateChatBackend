@@ -117,7 +117,13 @@
     {
         "status": 1006,
         "code": "ERR_NO_DESTINATION",
-        "description": "Request body must have either a chatId or a reciepent property.",
+        "description": "chatId doesn't match any existing chat id or any existing user id",
+        "customStatus": true
+    },
+    {
+        "status": 1007,
+        "code": "ERR_TOKEN_MISMATCH",
+        "description": "The token provided is valid. However, it is revoked and cannot be used to authenticate.",
         "customStatus": true
     }
 ]

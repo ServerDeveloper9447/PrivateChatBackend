@@ -4,8 +4,9 @@ import http from 'http'
 import express from 'express'
 import { Request, Response } from "express";
 import {MongoClient, ObjectId, ServerApiVersion} from 'mongodb'
-import * as errors from './assets/errors.json'
+import errors from './assets/errors.json'
 import crypto from 'crypto'
+import jwt from "jsonwebtoken";
 export const client = new MongoClient(process.env.MONGO_URI!,{serverApi:{strict:true,deprecationErrors:true,version:ServerApiVersion.v1}})
 export const db = client.db('Primary')
 export const makeError = (status:number,res:Res) => {
@@ -22,7 +23,6 @@ import { userValidate } from "./validations";
 
 const app = express()
 export const server = http.createServer(app)
-
 export type User = {
     "_id": ObjectId,
     "username": String,
@@ -32,7 +32,7 @@ export type User = {
         verified?: Boolean
     },
     "about"?: String,
-    "public_key": String,
+    "public_key": String
     "chatIds": ObjectId[] | [],
     "createdAt": Date,
     "banned"?: Boolean
@@ -79,33 +79,32 @@ app.post('/register',(req:Request,res:Res) => {
     try {
         const {username,password,email} = userRegisterSchema.parse(req.body)
         db.collection('Users').findOne({$or:[{username},{email}]})
-        .then(user => {
+        .then(async user => {
             if(!user) {
-                const salt = crypto.randomBytes(16)
-                crypto.pbkdf2(password, salt, 310000, 32, 'sha256', (err, hash) => {
-                    if(err) return makeError(500,res)(err);
-                    const at = crypto.randomBytes(32).toString('hex')
-                    const rt = crypto.randomBytes(32).toString('hex')
-                    const { publicKey, privateKey } = crypto.generateKeyPairSync('rsa', {
-                        modulusLength: 2048,
-                        publicKeyEncoding: { type: 'spki', format: 'pem' },
-                        privateKeyEncoding: { type: 'pkcs8', format: 'pem' }
-                    });
-                    db.collection('Users').insertOne({
-                        username,
-                        password: hash.toString('hex'),
-                        pass_salt: salt,
-                        email: {id:email},
-                        access_token: at,
-                        refresh_token: rt,
-                        chatIds: [],
-                        createdAt: new Date(),
-                        public_key: publicKey
-                    })
-                    .then(() => res.send({status: 200, access_token:at, refresh_token:rt, public_key: publicKey, private_key:privateKey}))
-                    .catch(makeError(500,res))
+                const salt = crypto.randomBytes(16).toString('hex')
+                const hash = crypto.pbkdf2Sync(password, salt, 310000, 32, 'sha256')
+                const _id = new ObjectId()
+                const at = jwt.sign({username,_id},process.env.AT_SECRET!,{expiresIn:'30d'})
+                const rt = jwt.sign({username,_id},process.env.RT_SECRET!,{expiresIn:'30d'})
+                const { publicKey, privateKey } = crypto.generateKeyPairSync('rsa', {
+                    modulusLength: 2048,
+                    publicKeyEncoding: { type: 'spki', format: 'pem' },
+                    privateKeyEncoding: { type: 'pkcs8', format: 'pem' }
+                });
+                await db.collection('Users').insertOne({
+                    _id,
+                    username,
+                    password: hash.toString('hex'),
+                    pass_salt: salt,
+                    email: {id:email},
+                    access_token: at,
+                    refresh_token: rt,
+                    chatIds: [],
+                    createdAt: new Date(),
+                    public_key: publicKey
                 })
-            } else makeError(1005,res)()
+                res.send({status: 200, access_token:at, refresh_token:rt, private_key:privateKey})
+            } else makeError(1005,res)
         })
     } catch(err) {
         makeError(400,res)(err)
@@ -115,33 +114,38 @@ app.post('/register',(req:Request,res:Res) => {
 app.post('/login',(req:Request,res:Res) => {
     try {
         const {identifier,password} = userLoginSchema.parse(req.body)
-        db.collection('Users').findOne({$or:[{username:identifier},{email:identifier}]})
-        .then(user => {
-            if(!user) return makeError(401,res)()
-            crypto.pbkdf2(password, user.pass_salt, 310000, 32, 'sha256', (err, hash) => {
-                if(err) return makeError(500,res)(err);
-                if(hash.toString('hex') !== user.password) return makeError(401,res)()
-                const at = crypto.randomBytes(32).toString('hex')
-                const rt = crypto.randomBytes(32).toString('hex')
-                db.collection('Users').updateOne({_id:user._id},{$set:{access_token:at,refresh_token:rt}})
-                .then(() => res.send({status:200,access_token:at,refresh_token:rt}))
-                .catch(makeError(500,res))
-            })
+        db.collection('Users').findOne({$or:[{username:identifier},{email:{id:identifier}}]})
+        .then(async user => {
+            if(!user) return makeError(401,res)();
+            const hash = crypto.pbkdf2Sync(password, user.pass_salt, 310000, 32, 'sha256')
+            if(hash.toString('hex') !== user.password) return makeError(401,res);
+            const _id = user._id.toString()
+            const at = jwt.sign({username:user.username,_id},process.env.AT_SECRET!,{expiresIn:'30d'})
+            const rt = jwt.sign({username:user.username,_id},process.env.RT_SECRET!,{expiresIn:'30d'})
+            const { publicKey, privateKey } = crypto.generateKeyPairSync('rsa', {
+                modulusLength: 2048,
+                publicKeyEncoding: { type: 'spki', format: 'pem' },
+                privateKeyEncoding: { type: 'pkcs8', format: 'pem' }
+            });
+            await db.collection('Users').updateOne({_id:user._id},{$set:{access_token:at,refresh_token:rt,public_key:publicKey}})
+            res.send({status:200,_id:user._id,access_token:at,refresh_token:rt,private_key:privateKey})
         })
-    } catch(err) {makeError(400,res)}
+    } catch(err) {makeError(400,res)(err)}
 })
 
 app.post('/refresh_tokens',async (req:Request,res:Res) => {
     try {
         const {refresh_token:ref} = req.body
-        db.collection('Users').findOne({ref})
-        .then(user => {
+        const {_id} = jwt.verify(ref,process.env.RT_SECRET!) as {_id:string}
+        if(!_id) return makeError(401,res);
+        db.collection('Users').findOne({_id:new ObjectId(_id)})
+        .then(async user => {
             if(!user) return makeError(401,res)()
-            const at = crypto.randomBytes(32).toString('hex')
-            const rt = crypto.randomBytes(32).toString('hex')
-            db.collection('Users').updateOne({_id:user._id},{$set:{access_token:at,refresh_token:rt}})
-            .then(() => res.send({status:200,access_token:at,refresh_token:rt}))
-            .catch(makeError(500,res))
+            if(user.refresh_token !== ref) return makeError(1007,res);
+            const at = jwt.sign({username:user.username,_id:user._id},process.env.AT_SECRET!,{expiresIn:'30d'})
+            const rt = jwt.sign({username:user.username,_id:user._id},process.env.RT_SECRET!,{expiresIn:'30d'})
+            await db.collection('Users').updateOne({_id:user._id},{$set:{access_token:at,refresh_token:rt}})
+            res.send({status:200,access_token:at,refresh_token:rt})
         })
     } catch(err) {
         makeError(401,res)(err)

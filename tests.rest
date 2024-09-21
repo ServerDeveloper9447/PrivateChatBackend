@@ -1,0 +1,50 @@
+### Register
+POST http://localhost:3000/register
+Content-Type: application/json
+
+{
+    "username":"demouser1",
+    "password":"ducksarethebest2006",
+    "email": "serverdeveloper@duck.com"
+}
+
+### Login
+POST http://localhost:3000/login
+Content-Type: application/json
+
+{
+    "identifier": "serverdeveloper@duck.com",
+    "password":"ducksarethebest2006"
+}
+
+### Refresh Token
+POST http://localhost:3000/refresh_tokens
+Content-Type: application/json
+
+{
+    "refresh_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImRlbW91c2VyMSIsIl9pZCI6IjY2ZWRhMmEwNzk3Mzk0YWNjZTY4MDhhYyIsImlhdCI6MTcyNjkxMTA1OSwiZXhwIjoxNzI5NTAzMDU5fQ.6MoF_bUxeh5KDkH81XIYgUTiKq11k54lBTz7a-Wmm_4"
+}
+
+### Search user
+GET http://localhost:3000/users/search?username=demouser1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImRlbW91c2VyMSIsIl9pZCI6IjY2ZWVhMzQ5NzdkMTZiODE1ZDdjMzE1MCIsImlhdCI6MTcyNjkxNTQwMSwiZXhwIjoxNzI5NTA3NDAxfQ.V2KAHVjj8k-h3dK6ErQR0aNFxiLduHau4-LFXWeO-Ak
+
+### Get User Chats
+GET http://localhost:3000/users/chats
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImRlbW91c2VyMSIsIl9pZCI6IjY2ZWVhMzQ5NzdkMTZiODE1ZDdjMzE1MCIsImlhdCI6MTcyNjkxNTQwMSwiZXhwIjoxNzI5NTA3NDAxfQ.V2KAHVjj8k-h3dK6ErQR0aNFxiLduHau4-LFXWeO-Ak
+
+### Get chat
+GET http://localhost:3000/chats/66ee92d72e977b1167c075c7
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImRlbW91c2VyMSIsIl9pZCI6IjY2ZWRhMmEwNzk3Mzk0YWNjZTY4MDhhYyIsImlhdCI6MTcyNjkxMTQxNCwiZXhwIjoxNzI5NTAzNDE0fQ.OQ4aOTHpfaMYsidglXmQLl3lSP5smCZe7biNsQmIkQc
+
+### Send Message
+POST http://localhost:3000/chats/66ee92d72e977b1167c075c7/messages
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImRlbW91c2VyMSIsIl9pZCI6IjY2ZWRhMmEwNzk3Mzk0YWNjZTY4MDhhYyIsImlhdCI6MTcyNjkxMTQxNCwiZXhwIjoxNzI5NTAzNDE0fQ.OQ4aOTHpfaMYsidglXmQLl3lSP5smCZe7biNsQmIkQc
+
+{
+    "content": "SGVsbG8gZ3V5cw==",
+    "createdAt": "2024-09-21T09:29:35.267Z",
+    "createdBy": "66eda2a0797394acce6808ac",
+    "chatId": "66ee92d72e977b1167c075c7"
+}

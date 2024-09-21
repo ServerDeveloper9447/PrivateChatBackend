@@ -12,7 +12,7 @@ export const userSchema = z.object({
         id: z.string().email(),
         verified: z.boolean().optional()
     }),
-    avatar: z.string(),
+    avatar: z.string().optional(),
     about: z.string().optional(),
     public_key: z.string(),
     chatIds: z.array(z.instanceof(ObjectId)).or(z.tuple([])),
@@ -23,16 +23,18 @@ export const userSchema = z.object({
 export const messageSchema = z.object({
     _id: z.instanceof(ObjectId).default(new ObjectId).or(z.string().transform(v => new ObjectId(v))),
     content: z.string().base64(),
-    createdAt: z.date().default(new Date()),
-    createdBy: z.instanceof(ObjectId).optional(),
+    createdAt: z.date().default(new Date()).or(z.string().transform(v => new Date(v))),
+    createdBy: z.instanceof(ObjectId).or(z.string().transform(v => new ObjectId(v))).optional(),
     edited: z.boolean().optional(),
-    chatId: z.instanceof(ObjectId).optional(),
+    chatId: z.instanceof(ObjectId).or(z.string().transform(v => new ObjectId(v))).optional(),
     read: z.boolean().default(false)
 })
 
 export const userValidate = async function (req:Request,res:Res,next:NextFunction) {
     try {
-        req.user = userSchema.parse(await users.findOne({access_token:req.headers.authorization?.split(" ")[1]}))
+        const user = await users.findOne({access_token:req.headers.authorization?.split(" ")[1]})
+        if(!user) return makeError(401,res);
+        req.user = userSchema.parse(user)
         next()
     } catch(err) {
         makeError(400,res)(err)
