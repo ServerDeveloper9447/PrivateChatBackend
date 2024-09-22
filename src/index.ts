@@ -88,7 +88,7 @@ app.post('/register',(req:Request,res:Res) => {
                     createdAt: new Date(),
                     public_key: publicKey
                 })
-                res.send({status: 200, access_token:at, refresh_token:rt, private_key:privateKey})
+                res.status(201).send({status: 201, access_token:at, refresh_token:rt, private_key:privateKey})
             } else makeError(1005,res)
         })
     } catch(err) {

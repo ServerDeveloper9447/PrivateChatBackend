@@ -17,22 +17,38 @@ export class Connections {
         this.entries.push([this.entries.length,value])
     }
 
-    delete(predicate: (value:any) => boolean) {
+    delete(predicate: (value:{
+        isAlive: Boolean,
+        user: User,
+        ws: WebSocket
+    }) => boolean) {
         const index = this.entries.findIndex(([k,v]) => predicate(v))
         if(!index) return -1;
         this.entries = this.entries.filter(([k,v]) => k !== index);
         return 1;
     }
 
-    find(predicate: (value:any) => boolean) {
+    find(predicate: (value:{
+        isAlive: Boolean,
+        user: User,
+        ws: WebSocket
+    }) => boolean) {
         return this.entries.find(([k,v]) => predicate(v))?.[1]
     }
 
-    filter(predicate: (value:any) => boolean) {
+    filter(predicate: (value:{
+        isAlive: Boolean,
+        user: User,
+        ws: WebSocket
+    }) => boolean) {
         return this.entries.filter(([k,v]) => predicate(v)).map(([k,v]) => v)
     }
 
-    map(predicate: (value:any) => any) {
+    map(predicate: (value:{
+        isAlive: Boolean,
+        user: User,
+        ws: WebSocket
+    }) => any) {
         return this.entries.map(([k,v]) => predicate(v))
     }
 
