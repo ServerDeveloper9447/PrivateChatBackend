@@ -66,6 +66,7 @@ router.post('/:id/messages', async (req: express.Request, res: Res) => {
         if (!cht) {
             const user = await userdb.findOne({ _id: message.chatId })
             if (!user) return makeError(1006, res);
+            message.readBy = [req.user._id]
             const msg = await messages.insertOne(message)
             let chat = await chatdb.insertOne({ avatar: req.user.avatar, direct: true, createdBy: req.user._id, messageIds: [msg.insertedId], memberIds: [user._id, req.user._id] })
             await userdb.updateMany({ _id: { $in: [req.user._id, user._id] } }, { $push: { chatIds: chat.insertedId } } as PushOperator<Document>)

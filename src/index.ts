@@ -52,12 +52,12 @@ app.get('/stats',async (req:Request,res:Res) => {
 
 const userRegisterSchema = z.object({
     username: z.string(),
-    password: z.string().min(8,"Password must be 8 characters long."),
+    password: z.string().regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/),
     email: z.string().email()
 })
 const userLoginSchema = z.object({
     identifier: z.string().or(z.string().email()),
-    password: z.string().min(8,"Password must be 8 characters long.")
+    password: z.string().regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/)
 })
 
 app.post('/register',(req:Request,res:Res) => {
