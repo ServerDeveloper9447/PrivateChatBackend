@@ -43,13 +43,13 @@ export const chatsSchema = z.object({
     memberIds: z.array(z.instanceof(ObjectId)).or(z.array(z.string()).transform(v => v.map(x => new ObjectId(x))))
 })
 
-export const userValidate = async function (req:Request,res:Res,next:NextFunction) {
+export const userValidate = async function (req: Request, res: Res, next: NextFunction) {
     try {
-        const user = await users.findOne({access_token:req.headers.authorization?.split(" ")[1]})
-        if(!user) return makeError(401,res);
+        const user = await users.findOne({ access_token: req.headers.authorization?.split(" ")[1] })
+        if (!user) return makeError(401, res);
         req.user = userSchema.parse(user)
         next()
-    } catch(err) {
-        makeError(400,res)(err)
+    } catch (err) {
+        makeError(400, res)(err)
     }
 }

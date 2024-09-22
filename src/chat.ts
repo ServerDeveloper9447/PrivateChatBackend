@@ -26,36 +26,36 @@ router.post('/create', async (req: express.Request, res: Res) => {
         if (parsed.direct == true) return makeError(1008, res);
         let precheck = await chatdb.findOne({ _id: parsed._id })
         if (precheck != null) return makeError(409, res);
-        if([...new Set(parsed.memberIds)].length !== parsed.memberIds.length) return makeError(1009, res);
+        if ([...new Set(parsed.memberIds)].length !== parsed.memberIds.length) return makeError(1009, res);
         let users = await userdb.countDocuments({ _id: { $in: parsed.memberIds } })
-        if(users != parsed.memberIds.length) return makeError(404, res);
+        if (users != parsed.memberIds.length) return makeError(404, res);
         const nchat = await chatdb.insertOne(parsed)
-        await userdb.updateMany({_id:{$in:parsed.memberIds}},{$push:{chatIds:nchat.insertedId}} as PushOperator<Document>)
+        await userdb.updateMany({ _id: { $in: parsed.memberIds } }, { $push: { chatIds: nchat.insertedId } } as PushOperator<Document>)
         res.status(201).send({ status: 201, chatId: nchat.insertedId })
     } catch (err) { makeError(400, res)(err) }
 })
 
-router.delete('/delete',async (req:express.Request,res:Res) => {
+router.delete('/delete', async (req: express.Request, res: Res) => {
     try {
         const parsed = z.object({
             _id: z.string().transform(v => new ObjectId(v))
         }).parse(req.body)
-        if(!req.user.chatIds.find(x => parsed._id.equals(x))) return makeError(403,res);
-        const chat = await chatdb.findOne({_id:parsed._id})
-        if(!chat) {
-            await userdb.updateMany({chatIds:parsed._id},{$pull:{chatIds:parsed._id}} as PullOperator<Document>)
-            return makeError(404,res);
+        if (!req.user.chatIds.find(x => parsed._id.equals(x))) return makeError(403, res);
+        const chat = await chatdb.findOne({ _id: parsed._id })
+        if (!chat) {
+            await userdb.updateMany({ chatIds: parsed._id }, { $pull: { chatIds: parsed._id } } as PullOperator<Document>)
+            return makeError(404, res);
         }
-        if(!chat.memberIds.includes(req.user._id)) {
-            await userdb.updateMany({$and:[{chatIds:parsed._id},{_id:{$nin:chat.memberIds}}]},{$pull:{chatIds:parsed._id}} as PullOperator<Document>)
-            return makeError(403,res);
+        if (!chat.memberIds.includes(req.user._id)) {
+            await userdb.updateMany({ $and: [{ chatIds: parsed._id }, { _id: { $nin: chat.memberIds } }] }, { $pull: { chatIds: parsed._id } } as PullOperator<Document>)
+            return makeError(403, res);
         }
-        if(!parsed._id.equals(chat.createdBy)) return makeError(403,res);
-        await messages.deleteMany({ _id: {$in:chat.messageIds} })
-        await chatdb.deleteOne({_id:chat._id})
-        connections.filter(x => chat.memberIds.includes(x.user._id)).forEach(x => x.ws?.send(JSON.stringify({event:"ChatDeleted",data:{chatId:parsed._id}})))
-        res.status(204).send({status:204})
-    } catch(err) {makeError(500,res)(err)}
+        if (!parsed._id.equals(chat.createdBy)) return makeError(403, res);
+        await messages.deleteMany({ _id: { $in: chat.messageIds } })
+        await chatdb.deleteOne({ _id: chat._id })
+        connections.filter(x => chat.memberIds.includes(x.user._id)).forEach(x => x.ws?.send(JSON.stringify({ event: "ChatDeleted", data: { chatId: parsed._id } })))
+        res.status(204).send({ status: 204 })
+    } catch (err) { makeError(500, res)(err) }
 })
 
 router.get('/:id', async (req: express.Request, res: Res) => {
@@ -85,7 +85,7 @@ router.get('/:id', async (req: express.Request, res: Res) => {
 router.post('/:id/messages', async (req: express.Request, res: Res) => {
     try {
         const message = messageSchema.parse(req.body)
-        if(!req.user._id.equals(message.createdBy) || req.user._id.equals(message.chatId)) return makeError(400,res);
+        if (!req.user._id.equals(message.createdBy) || req.user._id.equals(message.chatId)) return makeError(400, res);
         let cht = await chatdb.findOne({ _id: message.chatId })
         if (!cht) {
             const user = await userdb.findOne({ _id: message.chatId })
