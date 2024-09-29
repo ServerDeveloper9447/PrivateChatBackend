@@ -13,7 +13,7 @@ POST http://localhost:3000/login
 Content-Type: application/json
 
 {
-    "identifier": "serverdeveloper@duck.com",
+    "identifier": "demouser1",
     "password":"ducksarethebest2006"
 }
 
@@ -31,13 +31,13 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImRlb
 
 ### Get User Chats
 GET http://localhost:3000/users/chats
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImRlbW91c2VyMSIsIl9pZCI6IjY2ZWVhMzQ5NzdkMTZiODE1ZDdjMzE1MCIsImlhdCI6MTcyNjkzMTc4MCwiZXhwIjoxNzI5NTIzNzgwfQ.s9rGPlYZilZr5_4gKapJFCu40_qSjGYjUtGj7ZlFbtQ
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImRlbW91c2VyMSIsIl9pZCI6IjY2ZWVhMzQ5NzdkMTZiODE1ZDdjMzE1MCIsImlhdCI6MTcyNzU0MTI2NiwiZXhwIjoxNzMwMTMzMjY2fQ.T1zPqNyIPK7DnP-Ld2ZXQjjCruvhyHC_I_nTZcew-1o
 
 
 
 ### Get chat
-GET http://localhost:3000/chats/66ee92d72e977b1167c075c7
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImRlbW91c2VyMSIsIl9pZCI6IjY2ZWVhMzQ5NzdkMTZiODE1ZDdjMzE1MCIsImlhdCI6MTcyNjkyOTU4OCwiZXhwIjoxNzI5NTIxNTg4fQ.EZLNnnP1ehkuhBoHBoDbjOumGmFEHVlaabbZ-MsLVvk
+GET http://localhost:3000/chats/66eee51b6f1c15754e1a1d7b
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImRlbW91c2VyMSIsIl9pZCI6IjY2ZWVhMzQ5NzdkMTZiODE1ZDdjMzE1MCIsImlhdCI6MTcyNzU0MTI2NiwiZXhwIjoxNzMwMTMzMjY2fQ.T1zPqNyIPK7DnP-Ld2ZXQjjCruvhyHC_I_nTZcew-1o
 
 ### Send Message
 POST http://localhost:3000/chats/66eea34977d16b815d7c3150/messages

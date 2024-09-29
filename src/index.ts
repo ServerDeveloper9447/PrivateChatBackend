@@ -57,7 +57,7 @@ const userRegisterSchema = z.object({
 })
 const userLoginSchema = z.object({
     identifier: z.string().or(z.string().email()),
-    password: z.string().regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/)
+    password: z.string()
 })
 
 app.post('/register', (req: Request, res: Res) => {

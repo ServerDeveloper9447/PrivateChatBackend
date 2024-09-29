@@ -4,6 +4,7 @@ import { ObjectId, PullOperator, PushOperator } from 'mongodb'
 import { chatsSchema, messageSchema } from './validations'
 import { connections } from './ws'
 import { z } from 'zod'
+import { read } from 'fs'
 
 const router = express.Router()
 const chatdb = db.collection('Chats')
@@ -78,19 +79,21 @@ router.get('/:id', async (req: express.Request, res: Res) => {
             }
         ]).toArray()
         if (!chat) return makeError(404, res)();
-        res.send({ status: 200, chat })
+        await messages.updateMany({ _id: { $in: chat[0].messages?.map((x:{_id:ObjectId} & {}) => x?._id) }, readBy: { $ne: req.user._id } }, { $push: { readBy: req.user._id } } as PushOperator<Document>)
+        chat[0].messages?.forEach((m: { _id: ObjectId }&{}) => m?._id && connections.filter(x => chat[0].memberIds.includes(x.user._id)).forEach(x => x.ws?.send(JSON.stringify({ event: "MessageRead", data: { chatId: chat[0]._id, messageId: m._id, readBy: req.user._id } }))))
+        res.send({ status: 200, chat: chat[0] })
     } catch (err) { makeError(500, res)(err) }
 })
 
 router.post('/:id/messages', async (req: express.Request, res: Res) => {
     try {
         const message = messageSchema.parse(req.body)
+        message.readBy = [req.user._id]
         if (!req.user._id.equals(message.createdBy) || req.user._id.equals(message.chatId)) return makeError(400, res);
         let cht = await chatdb.findOne({ _id: message.chatId })
         if (!cht) {
             const user = await userdb.findOne({ _id: message.chatId })
             if (!user) return makeError(1006, res);
-            message.readBy = [req.user._id]
             const msg = await messages.insertOne(message)
             let chat = await chatdb.insertOne({ avatar: req.user.avatar, direct: true, createdBy: req.user._id, messageIds: [msg.insertedId], memberIds: [user._id, req.user._id] })
             await userdb.updateMany({ _id: { $in: [req.user._id, user._id] } }, { $push: { chatIds: chat.insertedId } } as PushOperator<Document>)
