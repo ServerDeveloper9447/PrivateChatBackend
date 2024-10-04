@@ -1,7 +1,7 @@
 {
   "name": "privatechat",
   "version": "1.0.0",
-  "description": "",
+  "description": "```json\r {\r     \"_id\": ObjectId,\r     \"username\": String,\r     \"password\": String,\r     \"pass_salt\": String,\r     \"avatar\": \"base64string\",\r     \"email\": {id:\"validated_verified_email\",verified:Boolean},\r     \"about\": \"max_120_char_string\",\r     \"public_key\": String,\r     \"chatIds\": ObjectId[],\r     \"createdAt\": Date,\r     \"banned\": Boolean\r }\r ```\r ## User Summary Schema\r ```json\r {\r     \"_id\": ObjectId,\r     \"username\": String,\r     \"avatar\"?: String,\r     \"public_key\": String\r }\r ```\r ## Messages Schema\r ```json\r {\r     \"_id\": ObjectId,\r     \"content\": String,\r     \"createdAt\": String,\r     \"createdBy\": ObjectId,\r     \"edited\": Boolean,\r     \"readBy\": ObjectId[],\r     \"chatId\": ObjectId\r }\r ```\r ## Chats Schema\r ```json\r {\r     \"_id\": ObjectId,\r     \"name\": String | undefined, // undefined if it's a direct message\r     \"createdAt\": String,\r     \"createdBy\": ObjectId,\r     \"messageIds\": ObjectId[] | [],\r     \"avatar\": \"base64string\",\r     \"memberIds\": ObjectId[],\r     \"direct\": Boolean\r }",
   "main": "index.js",
   "scripts": {
     "start": "node dist/index",
@@ -22,7 +22,10 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
+    "@types/express": "^5.0.0",
+    "@types/jsonwebtoken": "^9.0.7",
     "@types/mongodb": "^4.0.6",
+    "@types/node": "^22.7.4",
     "@types/ws": "^8.5.12",
     "typescript": "^5.6.2"
   },
