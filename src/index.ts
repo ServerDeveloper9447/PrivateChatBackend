@@ -6,6 +6,7 @@ import { Request, Response } from "express";
 import { MongoClient, ObjectId, ServerApiVersion } from 'mongodb'
 import errors from './assets/errors.json'
 import crypto from 'crypto'
+import argon from 'argon2'
 import jwt from "jsonwebtoken";
 import { z } from "zod";
 export const client = new MongoClient(process.env.MONGO_URI!, { serverApi: { strict: true, deprecationErrors: true, version: ServerApiVersion.v1 } })
@@ -35,6 +36,7 @@ app.use(express.json())
 app.use(express.urlencoded({ extended: true }));
 
 export interface Res extends Response {
+    status(number: number): any
     send(body: { status: number, [key: string]: any }): any
 }
 
@@ -66,8 +68,7 @@ app.post('/register', (req: Request, res: Res) => {
         db.collection('Users').findOne({ $or: [{ username }, { email }] })
             .then(async user => {
                 if (!user) {
-                    const salt = crypto.randomBytes(16).toString('hex')
-                    const hash = crypto.pbkdf2Sync(password, salt, 310000, 32, 'sha256')
+                    const argonhash = await argon.hash(password)
                     const _id = new ObjectId()
                     const at = jwt.sign({ username, _id }, process.env.AT_SECRET!, { expiresIn: '30d' })
                     const rt = jwt.sign({ username, _id }, process.env.RT_SECRET!, { expiresIn: '30d' })
@@ -79,8 +80,7 @@ app.post('/register', (req: Request, res: Res) => {
                     await db.collection('Users').insertOne({
                         _id,
                         username,
-                        password: hash.toString('hex'),
-                        pass_salt: salt,
+                        password: argonhash,
                         email: { id: email },
                         access_token: at,
                         refresh_token: rt,
@@ -102,8 +102,11 @@ app.post('/login', (req: Request, res: Res) => {
         db.collection('Users').findOne({ $or: [{ username: identifier }, { email: { id: identifier } }] })
             .then(async user => {
                 if (!user) return makeError(401, res)();
-                const hash = crypto.pbkdf2Sync(password, user.pass_salt, 310000, 32, 'sha256')
-                if (hash.toString('hex') !== user.password) return makeError(401, res);
+                try {
+                    await argon.verify(user.password,password)
+                } catch(err) {
+                    return makeError(401,res)(err)
+                }
                 const _id = user._id.toString()
                 const at = jwt.sign({ username: user.username, _id }, process.env.AT_SECRET!, { expiresIn: '30d' })
                 const rt = jwt.sign({ username: user.username, _id }, process.env.RT_SECRET!, { expiresIn: '30d' })
@@ -118,14 +121,14 @@ app.post('/login', (req: Request, res: Res) => {
     } catch (err) { makeError(400, res)(err) }
 })
 
-app.post('/refresh_tokens', async (req: Request, res: Res) => {
+app.post('/refresh_tokens', (req: Request,res: Res) => {
     try {
         const { refresh_token: ref } = req.body
         const { _id } = jwt.verify(ref, process.env.RT_SECRET!) as { _id: string }
-        if (!_id) return makeError(401, res);
+        if (!_id) return makeError(401, res)();
         db.collection('Users').findOne({ _id: new ObjectId(_id) })
             .then(async user => {
-                if (!user) return makeError(401, res)()
+                if (!user) return makeError(401, res)();
                 if (user.refresh_token !== ref) return makeError(1007, res);
                 const at = jwt.sign({ username: user.username, _id: user._id }, process.env.AT_SECRET!, { expiresIn: '30d' })
                 const rt = jwt.sign({ username: user.username, _id: user._id }, process.env.RT_SECRET!, { expiresIn: '30d' })

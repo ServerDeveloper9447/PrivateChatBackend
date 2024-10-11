@@ -4,7 +4,6 @@
     "_id": ObjectId,
     "username": String,
     "password": String,
-    "pass_salt": String,
     "avatar": "base64string",
     "email": {id:"validated_verified_email",verified:Boolean},
     "about": "max_120_char_string",
