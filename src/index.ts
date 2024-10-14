@@ -68,7 +68,7 @@ app.post('/register', (req: Request, res: Res) => {
         db.collection('Users').findOne({ $or: [{ username }, { email }] })
             .then(async user => {
                 if (!user) {
-                    const argonhash = await argon.hash(password)
+                    const hash = await argon.hash(password)
                     const _id = new ObjectId()
                     const at = jwt.sign({ username, _id }, process.env.AT_SECRET!, { expiresIn: '30d' })
                     const rt = jwt.sign({ username, _id }, process.env.RT_SECRET!, { expiresIn: '30d' })
@@ -80,7 +80,7 @@ app.post('/register', (req: Request, res: Res) => {
                     await db.collection('Users').insertOne({
                         _id,
                         username,
-                        password: argonhash,
+                        password: hash,
                         email: { id: email },
                         access_token: at,
                         refresh_token: rt,
@@ -143,4 +143,4 @@ app.post('/refresh_tokens', (req: Request,res: Res) => {
 app.use('/users', userValidate, users)
 app.use('/chats', userValidate, chats)
 
-server.listen(process.env.PORT || 3000, () => console.log("Backend Online"))
+server.listen(process.env.PORT || 3000, () => console.log(`Listening on http://localhost:${process.env.PORT || 3000}`))

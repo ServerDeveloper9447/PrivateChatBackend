@@ -4,7 +4,7 @@ Content-Type: application/json
 
 {
     "username":"demouser1",
-    "password":"ducksarethebest2006",
+    "password":"Password1!",
     "email": "serverdeveloper@duck.com"
 }
 
@@ -14,7 +14,7 @@ Content-Type: application/json
 
 {
     "identifier": "demouser1",
-    "password":"ducksarethebest2006"
+    "password":"Password1!"
 }
 
 ### Refresh Token
