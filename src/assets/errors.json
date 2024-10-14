@@ -137,5 +137,17 @@
         "code": "ERR_VALUE_DUPLICATE",
         "description": "Request body includes one or more duplicate values.",
         "customStatus": true
+    },
+    {
+        "status": 1010,
+        "code": "ERR_PASSWORD_MISMATCH",
+        "description": "The password provided does not match the user's current password.",
+        "customStatus": true
+    },
+    {
+        "status": 1011,
+        "code": "ERR_USER_NOT_FOUND",
+        "description": "No user exists with the provided email address.",
+        "customStatus": true
     }
 ]

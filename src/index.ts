@@ -9,6 +9,7 @@ import crypto from 'crypto'
 import argon from 'argon2'
 import jwt from "jsonwebtoken";
 import { z } from "zod";
+import cors from 'cors'
 export const client = new MongoClient(process.env.MONGO_URI!, { serverApi: { strict: true, deprecationErrors: true, version: ServerApiVersion.v1 } })
 export const db = client.db('Primary')
 const app = express()
@@ -34,6 +35,7 @@ declare global {
 
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }));
+app.use(cors())
 
 export interface Res extends Response {
     status(number: number): any
@@ -58,7 +60,7 @@ const userRegisterSchema = z.object({
     email: z.string().email()
 })
 const userLoginSchema = z.object({
-    identifier: z.string().or(z.string().email()),
+    email: z.string().email(),
     password: z.string()
 })
 
@@ -98,12 +100,13 @@ app.post('/register', (req: Request, res: Res) => {
 
 app.post('/login', (req: Request, res: Res) => {
     try {
-        const { identifier, password } = userLoginSchema.parse(req.body)
-        db.collection('Users').findOne({ $or: [{ username: identifier }, { email: { id: identifier } }] })
+        const { email, password } = userLoginSchema.parse(req.body)
+        db.collection('Users').findOne({email:{id:email}})
             .then(async user => {
-                if (!user) return makeError(401, res)();
+                if (!user) return makeError(1011, res)();
                 try {
-                    await argon.verify(user.password,password)
+                    const t = await argon.verify(user.password,password)
+                    if(!t) return makeError(1010,res)();
                 } catch(err) {
                     return makeError(401,res)(err)
                 }

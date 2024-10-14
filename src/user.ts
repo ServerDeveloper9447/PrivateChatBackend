@@ -21,7 +21,29 @@ router.get('/search', async (req: express.Request, res: Res) => {
 
 router.get('/chats', async (req: express.Request, res: Res) => {
     try {
-        const groups = await chats.find({ _id: { $in: req.user.chatIds } }).toArray()
+        const groups = await chats.aggregate([
+            { $match: { _id: { $in: req.user.chatIds } } },
+            {
+                $lookup: {
+                    from: 'Messages',
+                    localField: 'messageIds',
+                    foreignField: '_id',
+                    as: 'messages'
+                }
+            },
+            {
+                $addFields: {
+                    lastMessage: {
+                        $arrayElemAt: ['$messages.content', -1]
+                    }
+                }
+            },
+            {
+                $project: {
+                    messageIds: 0
+                }
+            }
+        ]).toArray()
         res.send({ status: 200, chatIds: groups })
     } catch (err) { makeError(500, res) }
 })

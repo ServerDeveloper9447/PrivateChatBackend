@@ -13,8 +13,8 @@ POST http://localhost:3000/login
 Content-Type: application/json
 
 {
-    "identifier": "demouser1",
-    "password":"Password1!"
+    "email": "serverdeveloper@duck.com",
+    "password":"Password1"
 }
 
 ### Refresh Token
@@ -31,7 +31,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImRlb
 
 ### Get User Chats
 GET http://localhost:3000/users/chats
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImRlbW91c2VyMSIsIl9pZCI6IjY2ZWVhMzQ5NzdkMTZiODE1ZDdjMzE1MCIsImlhdCI6MTcyNzU0MTI2NiwiZXhwIjoxNzMwMTMzMjY2fQ.T1zPqNyIPK7DnP-Ld2ZXQjjCruvhyHC_I_nTZcew-1o
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImRlbW91c2VyMSIsIl9pZCI6IjY3MGQzYjdiZmRjNWE0YTIyNzczZmU3NiIsImlhdCI6MTcyODkyMDQ0MywiZXhwIjoxNzMxNTEyNDQzfQ.zeau9mtxDZfm5Tlr1nlMWzmoqe8xdq2twMbqKGm2-nE
 
 
 
