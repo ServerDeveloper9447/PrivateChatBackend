@@ -44,5 +44,7 @@
     "messageIds": ObjectId[] | [],
     "avatar": "base64string",
     "memberIds": ObjectId[],
-    "direct": Boolean
+    "direct": Boolean,
+    "lastMessageId":  ObjectId
+
 }

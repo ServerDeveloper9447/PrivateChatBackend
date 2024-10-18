@@ -95,12 +95,13 @@ router.post('/:id/messages', async (req: express.Request, res: Res) => {
             const user = await userdb.findOne({ _id: message.chatId })
             if (!user) return makeError(1006, res);
             const msg = await messages.insertOne(message)
-            let chat = await chatdb.insertOne({ avatar: req.user.avatar, direct: true, createdBy: req.user._id, messageIds: [msg.insertedId], memberIds: [user._id, req.user._id] })
+            let chat = await chatdb.insertOne({ avatar: req.user.avatar, direct: true, createdBy: req.user._id, messageIds: [msg.insertedId], memberIds: [user._id, req.user._id], lastMessageId: msg.insertedId })
             await userdb.updateMany({ _id: { $in: [req.user._id, user._id] } }, { $push: { chatIds: chat.insertedId } } as PushOperator<Document>)
             connections.find(x => user._id.equals(x.user._id))?.ws?.send(JSON.stringify({ event: "ChatCreated", data: { avatar: req.user.avatar, direct: true, createdBy: req.user._id, messageIds: [msg.insertedId], memberIds: [user._id, req.user._id], createdAt: new Date() } }));
             return res.status(201).send({ status: 201, messageId: msg.insertedId, chatId: chat.insertedId })
         } else {
             const msg = await messages.insertOne(message)
+            await chatdb.updateOne({_id: cht._id},{$push:{messageIds: msg.insertedId},$set:{lastMessageId:msg.insertedId}} as PushOperator<Document>)
             cht?.memberIds?.forEach((x: ObjectId) => {
                 if (req.user._id.equals(x)) return;
                 connections.find(cn => cn.user._id.equals(x))?.ws?.send(JSON.stringify({ event: "MessageCreated", data: { messageId: msg.insertedId, chatId: cht._id, createdBy: req.user._id, createdAt: new Date() } }))
